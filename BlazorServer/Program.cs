@@ -13,23 +13,6 @@ builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
 builder.Services.AddSingleton<WeatherForecastService>();
 
-// Add authentication and authorization
-builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
-    .AddCookie(options =>
-    {
-        options.Cookie.HttpOnly = true;
-        options.ExpireTimeSpan = TimeSpan.FromMinutes(30);
-        options.LoginPath = "/Account/Login";
-        options.AccessDeniedPath = "/Account/AccessDenied";
-        options.SlidingExpiration = true;
-    });
-
-builder.Services.AddAuthorization(options =>
-{
-    options.AddPolicy("ADMIN", policy =>
-        policy.RequireRole("ADMIN"));
-});
-
 builder.Services.AddScoped<HttpClient>(s =>
 {
     var httpClient = new HttpClient { BaseAddress = new Uri("https://localhost:7134/") };
@@ -52,10 +35,6 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
-
-// Add authentication and authorization middleware
-app.UseAuthentication();
-app.UseAuthorization();
 
 app.MapBlazorHub();
 app.MapFallbackToPage("/_Host");

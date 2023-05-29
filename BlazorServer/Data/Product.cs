@@ -1,10 +1,14 @@
-﻿namespace BlazorServer.Data
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace BlazorServer.Data
 {
     public class Product
     {
-        public int Id { get; set; }
-        public string Name { get; set; }
-        public string SerialNumber { get; set; }
+        [Key]
+        public int SerialNumber { get; set; }
+        public int Amount { get; set; }
+        public string ProductName { get; set; }
+        public string ProductDescription { get; set; }
         // Andere eigenschappen van het product...
 
         public async Task<bool> ValidateSerialNumber()

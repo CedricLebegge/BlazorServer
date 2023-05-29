@@ -1,34 +1,26 @@
 ﻿@page "/product-management"
 @using BlazorServer.Data;
 @using System.Text.Json;
-@*@attribute [Authorize(Roles = "ADMIN")]*@
 
 @inject HttpClient httpClient
 @inject NavigationManager navigationManager
 
-<AuthorizeView Roles="ADMIN">
-    <Authorized>
-        <!-- Voeg hier de code toe om producten weer te geven, toe te voegen en te bewerken -->
-        <h3>Productbeheer</h3>
-        <p>
-            <!-- Productinformatie en bewerkingsformulier -->
-        </p>
+<!-- Voeg hier de code toe om producten weer te geven, toe te voegen en te bewerken -->
+<h3>Productbeheer</h3>
+<p>
+    <!-- Productinformatie en bewerkingsformulier -->
+</p>
 
-        <button @onclick="AddProduct">Nieuw product toevoegen</button>
+<button @onclick="AddProduct">Nieuw product toevoegen</button>
 
-        @if (editingProduct != null)
-        {
-            <h4>Bewerk product</h4>
-            <p>
-                <!-- Bewerkingsformulier -->
-            </p>
-            <button @onclick="SaveProductChanges">Opslaan</button>
-        }
-    </Authorized>
-    <NotAuthorized>
-        <p>U heeft geen toestemming om deze pagina te bekijken.</p>
-    </NotAuthorized>
-</AuthorizeView>
+@if (editingProduct != null)
+{
+    <h4>Bewerk product</h4>
+    <p>
+        <!-- Bewerkingsformulier -->
+    </p>
+    <button @onclick="SaveProductChanges">Opslaan</button>
+}
 
 @code {
     private List<Product> products;
@@ -78,7 +70,7 @@
 
         // Serienummer bestaat nog niet, voer de gewenste logica uit om het product bij te werken via de WebAPI.
 
-        HttpResponseMessage response = await httpClient.PutAsJsonAsync($"https://localhost:7134/api/Stock/{editingProduct.Id}", editingProduct);
+        HttpResponseMessage response = await httpClient.PutAsJsonAsync($"https://localhost:7134/api/Stock/{editingProduct.SerialNumber}", editingProduct);
 
         if (response.IsSuccessStatusCode)
         {
@@ -92,7 +84,7 @@
         }
     }
 
-    private async Task<bool> CheckSerialNumberExists(string serialNumber)
+    private async Task<bool> CheckSerialNumberExists(int serialNumber)
     {
         HttpResponseMessage response = await httpClient.GetAsync($"https://localhost:7134/api/Stock?serialNumber={serialNumber}");
 
