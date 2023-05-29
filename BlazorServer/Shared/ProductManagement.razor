@@ -1,0 +1,108 @@
+﻿@page "/product-management"
+@using BlazorServer.Data;
+@using System.Text.Json;
+@*@attribute [Authorize(Roles = "ADMIN")]*@
+
+@inject HttpClient httpClient
+@inject NavigationManager navigationManager
+
+<AuthorizeView Roles="ADMIN">
+    <Authorized>
+        <!-- Voeg hier de code toe om producten weer te geven, toe te voegen en te bewerken -->
+        <h3>Productbeheer</h3>
+        <p>
+            <!-- Productinformatie en bewerkingsformulier -->
+        </p>
+
+        <button @onclick="AddProduct">Nieuw product toevoegen</button>
+
+        @if (editingProduct != null)
+        {
+            <h4>Bewerk product</h4>
+            <p>
+                <!-- Bewerkingsformulier -->
+            </p>
+            <button @onclick="SaveProductChanges">Opslaan</button>
+        }
+    </Authorized>
+    <NotAuthorized>
+        <p>U heeft geen toestemming om deze pagina te bekijken.</p>
+    </NotAuthorized>
+</AuthorizeView>
+
+@code {
+    private List<Product> products;
+    private Product editingProduct;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadProducts();
+    }
+
+    private async Task LoadProducts()
+    {
+        HttpResponseMessage response = await httpClient.GetAsync("https://localhost:7134/api/Stock");
+
+        if (response.IsSuccessStatusCode)
+        {
+            string json = await response.Content.ReadAsStringAsync();
+            products = JsonSerializer.Deserialize<List<Product>>(json);
+        }
+        else
+        {
+            // Er is een fout opgetreden bij het ophalen van de producten, voer de gewenste logica uit (bijv. toon een foutmelding)
+        }
+    }
+
+    private async Task AddProduct()
+    {
+        // Navigeer naar de pagina voor het toevoegen van een nieuw product
+        navigationManager.NavigateTo("/product-add");
+    }
+
+    private async Task EditProduct(Product product)
+    {
+        editingProduct = product;
+    }
+
+    private async Task SaveProductChanges()
+    {
+        // Controleer of het serienummer al bestaat via de WebAPI
+        bool serialNumberExists = await CheckSerialNumberExists(editingProduct.SerialNumber);
+
+        if (serialNumberExists)
+        {
+            // Serienummer bestaat al, voer de gewenste logica uit (bijv. toon een foutmelding)
+            return;
+        }
+
+        // Serienummer bestaat nog niet, voer de gewenste logica uit om het product bij te werken via de WebAPI.
+
+        HttpResponseMessage response = await httpClient.PutAsJsonAsync($"https://localhost:7134/api/Stock/{editingProduct.Id}", editingProduct);
+
+        if (response.IsSuccessStatusCode)
+        {
+            // Product succesvol bijgewerkt, voer de gewenste logica uit (bijv. vernieuw de productlijst)
+            await LoadProducts();
+            editingProduct = null;
+        }
+        else
+        {
+            // Er is een fout opgetreden bij het bijwerken van het product, voer de gewenste logica uit (bijv. toon een foutmelding)
+        }
+    }
+
+    private async Task<bool> CheckSerialNumberExists(string serialNumber)
+    {
+        HttpResponseMessage response = await httpClient.GetAsync($"https://localhost:7134/api/Stock?serialNumber={serialNumber}");
+
+        if (response.IsSuccessStatusCode)
+        {
+            // Verwerk de API-reactie om te controleren of het serienummer al bestaat
+            // Return true als het serienummer al bestaat, anders false
+            return true;
+        }
+
+        return false;
+    }
+}
