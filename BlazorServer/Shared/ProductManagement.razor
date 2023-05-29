@@ -16,7 +16,11 @@
                 <th>Serial Number</th>
                 <th>Amount</th>
                 <th>Product Name</th>
-                <th>Product Description</th>
+                <th>Price</th>
+                <th>Metal</th>
+                <th>Purity</th>
+                <th>Weight</th>
+                <th>Image</th>
                 <th></th>
             </tr>
         </thead>
@@ -24,10 +28,14 @@
             @foreach (var product in products)
             {
                 <tr>
-                    <td>@product.SerialNumber</td>
+                    <td>@product.Id</td>
                     <td>@product.Amount</td>
-                    <td>@product.ProductName</td>
-                    <td>@product.ProductDescription</td>
+                    <td>@product.Name</td>
+                    <td>@product.Price</td>
+                    <td>@product.Metal</td>
+                    <td>@product.Purity</td>
+                    <td>@product.Weight</td>
+                    <td><img src="@product.Image" alt="Product Image" /></td>
                     <td>
                         <button class="btn btn-primary btn-sm" @onclick="() => EditProduct(product)">Edit</button>
                     </td>
@@ -54,12 +62,32 @@ else
 
     <div class="form-group">
         <label for="productName">Product Name</label>
-        <input class="form-control" id="productName" @bind="@newProduct.ProductName" />
+        <input class="form-control" id="productName" @bind="@newProduct.Name" />
     </div>
 
     <div class="form-group">
-        <label for="productDescription">Product Description</label>
-        <input class="form-control" id="productDescription" @bind="@newProduct.ProductDescription" />
+        <label for="price">Price</label>
+        <input class="form-control" id="price" @bind="@newProduct.Price" />
+    </div>
+
+    <div class="form-group">
+        <label for="metal">Metal</label>
+        <input class="form-control" id="metal" @bind="@newProduct.Metal" />
+    </div>
+
+    <div class="form-group">
+        <label for="purity">Purity</label>
+        <input class="form-control" id="purity" @bind="@newProduct.Purity" />
+    </div>
+
+    <div class="form-group">
+        <label for="weight">Weight</label>
+        <input class="form-control" id="weight" @bind="@newProduct.Weight" />
+    </div>
+
+    <div class="form-group">
+        <label for="image">Image URL</label>
+        <input class="form-control" id="image" @bind="@newProduct.Image" />
     </div>
 
     <button class="btn btn-primary" @onclick="AddProduct">Save</button>
@@ -76,12 +104,32 @@ else
 
     <div class="form-group">
         <label for="editProductName">Product Name</label>
-        <input class="form-control" id="editProductName" @bind="@editingProduct.ProductName" />
+        <input class="form-control" id="editProductName" @bind="@editingProduct.Name" />
     </div>
 
     <div class="form-group">
-        <label for="editProductDescription">Product Description</label>
-        <input class="form-control" id="editProductDescription" @bind="@editingProduct.ProductDescription" />
+        <label for="editPrice">Price</label>
+        <input class="form-control" id="editPrice" @bind="@editingProduct.Price" />
+    </div>
+
+    <div class="form-group">
+        <label for="editMetal">Metal</label>
+        <input class="form-control" id="editMetal" @bind="@editingProduct.Metal" />
+    </div>
+
+    <div class="form-group">
+        <label for="editPurity">Purity</label>
+        <input class="form-control" id="editPurity" @bind="@editingProduct.Purity" />
+    </div>
+
+    <div class="form-group">
+        <label for="editWeight">Weight</label>
+        <input class="form-control" id="editWeight" @bind="@editingProduct.Weight" />
+    </div>
+
+    <div class="form-group">
+        <label for="editImage">Image URL</label>
+        <input class="form-control" id="editImage" @bind="@editingProduct.Image" />
     </div>
 
     <button class="btn btn-primary" @onclick="SaveProductChanges">Save Changes</button>
@@ -145,10 +193,14 @@ else
     {
         editingProduct = new Product
             {
-                SerialNumber = product.SerialNumber,
+                Id = product.Id,
                 Amount = product.Amount,
-                ProductName = product.ProductName,
-                ProductDescription = product.ProductDescription
+                Name = product.Name,
+                Price = product.Price,
+                Metal = product.Metal,
+                Purity = product.Purity,
+                Weight = product.Weight,
+                Image = product.Image
             };
     }
 
@@ -157,7 +209,7 @@ else
         if (editingProduct != null)
         {
             // Update existing product
-            HttpResponseMessage response = await httpClient.PutAsJsonAsync($"https://localhost:7134/api/Stock/{editingProduct.SerialNumber}", editingProduct);
+            HttpResponseMessage response = await httpClient.PutAsJsonAsync($"https://localhost:7134/api/Stock/{editingProduct.Id}", editingProduct);
             if (response.IsSuccessStatusCode)
             {
                 await LoadProducts();
